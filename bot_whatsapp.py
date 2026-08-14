@@ -4,7 +4,6 @@ from flask import Flask
 import mysql.connector
 from neonize.client import NewClient
 
-# 1. Servidor web de Flask para mantener el puerto abierto en Render
 app = Flask(__name__)
 
 @app.route("/")
@@ -15,7 +14,6 @@ def run_flask():
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
 
-# 2. Configuración del Bot de WhatsApp
 RUTA_BASE = os.path.dirname(os.path.abspath(__file__))
 ARCHIVO_SESION = os.path.join(RUTA_BASE, "sesion_bot.sqlite3")
 
@@ -23,10 +21,11 @@ client = NewClient(ARCHIVO_SESION)
 
 @client.event
 def on_message(client_instance: NewClient, message):
+    # Imprimir en los logs que CUALQUIER evento de mensaje entró al sistema
+    print(f"🔔 EVENTO CAPTURADO: {message}")
     try:
         chat = message.info.chat
         
-        # Extraer texto de forma robusta
         texto = ""
         msg_content = message.message
         if msg_content.conversation:
@@ -34,8 +33,7 @@ def on_message(client_instance: NewClient, message):
         elif msg_content.extendedTextMessage and msg_content.extendedTextMessage.text:
             texto = msg_content.extendedTextMessage.text
         
-        if texto:
-            print(f"💬 Mensaje detectado de {chat}: '{texto}'")
+        print(f"💬 Texto extraído: '{texto}'")
 
         if texto.strip().lower() == "/ping":
             client_instance.send_message(chat, "🤖 ¡Pong! CyberStore en la nube activo.")
@@ -45,11 +43,9 @@ def on_message(client_instance: NewClient, message):
         print(f"⚠️ Error procesando mensaje: {e}")
 
 if __name__ == "__main__":
-    # Arrancar Flask en un hilo secundario
     t = threading.Thread(target=run_flask)
     t.daemon = True
     t.start()
 
     print("🚀 Iniciando cliente de WhatsApp...")
-    # Aseguramos el inicio de la conexión del cliente
     client.connect()
