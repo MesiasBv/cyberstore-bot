@@ -26,7 +26,7 @@ def on_message(client_instance: NewClient, message):
     try:
         chat = message.info.chat
         
-        # Extraer texto de forma robusta (soporta chats privados y grupos)
+        # Extraer texto de forma robusta
         texto = ""
         msg_content = message.message
         if msg_content.conversation:
@@ -34,7 +34,6 @@ def on_message(client_instance: NewClient, message):
         elif msg_content.extendedTextMessage and msg_content.extendedTextMessage.text:
             texto = msg_content.extendedTextMessage.text
         
-        # Esto imprimirá en los logs de Render CUALQUIER mensaje que detecte el bot
         if texto:
             print(f"💬 Mensaje detectado de {chat}: '{texto}'")
 
@@ -51,5 +50,6 @@ if __name__ == "__main__":
     t.daemon = True
     t.start()
 
-    print("🚀 Iniciando bot de WhatsApp en Render...")
+    print("🚀 Iniciando cliente de WhatsApp...")
+    # Aseguramos el inicio de la conexión del cliente
     client.connect()
